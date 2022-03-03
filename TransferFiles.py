@@ -12,27 +12,27 @@ import os
 import logging
 import threading
 import time
-from io import BytesIO
+import subprocess
 
 class TransferFiles:
     filesnames = []
 
   # Initialize the file names we want to download
-    def __init__(self, filesnames):
-        self.filesnames = ["linpeas","lse","linenum","pspy"]
+    def __init__(self):
+        self.filesnames = ["linpeas.sh","pspy.go"]
 
   # Get the latest version of the files
     def get_required_files():
         # Get the latest version of Linpeas
         os.system("curl -o linpeas.sh -L https://github.com/carlospolop/PEASS-ng/releases/latest/download/linpeas.sh")
-
+        print(subprocess.call("./pspy_install.sh"))
 
     # Maybe I should check if the file already exists first and then download it
     # If it exists I will just `return` 
     # To make sure that the file's name is proper we can rename it after downloading it just to be sure ( Check how to do that exactly )
 
     # The logic to transfer one file
-    def one_file_transfer(filename):
+    def send_one_file(filename):
 
         SEPARATOR = "<SEPARATOR>"
         BUFFER_SIZE = 4096
@@ -69,7 +69,53 @@ class TransferFiles:
                 s.close()
 
     # The whole transfer of all the files (Threaded)
-    def transfer_files(self):
+    def send_files(self):
         for i in range(len(self.filesnames)):
             file_thread = threading.Thread(target=self.one_file_transfer, args=(self.filesnames[i]))
             file_thread.start()
+
+
+
+
+    # Server stuff 
+    def recieve_one_file(filename):
+         # device's IP address
+        SERVER_HOST = "0.0.0.0"
+        SERVER_PORT = 9999
+        # receive 4096 bytes each time
+        BUFFER_SIZE = 4096
+        SEPARATOR = "<SEPARATOR>"
+
+        s = socket.socket()
+        s.bind((SERVER_HOST, SERVER_PORT))
+
+        s.listen(5)
+        print(f"[*] Listening as {SERVER_HOST}:{SERVER_PORT}")
+
+        client_socket, address = s.accept() 
+        # if below code is executed, that means the sender is connected
+        print(f"[+] {address} is connected.")
+
+        with open(filename, "wb") as f:
+            while True:
+                # read 1024 bytes from the socket (receive)
+                bytes_read = client_socket.recv(BUFFER_SIZE)
+                if not bytes_read:    
+                    # nothing is received
+                    # file transmitting is done
+                    break
+                # write to the file the bytes we just received
+                f.write(bytes_read)
+                # update the progress bar
+                # progress.update(len(bytes_read))
+
+        # close the client socket
+        client_socket.close()
+        # close the server socket
+        s.close()
+
+    def we_are_listening(self):
+        for i in range(len(self.filesnames)):
+            file_thread = threading.Thread(target=self.one_file_transfer, args=(self.filesnames[i]))
+            file_thread.start()
+       
