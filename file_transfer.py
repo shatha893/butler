@@ -18,7 +18,7 @@
 # 6. Now I have to upgrade the reverse shell (I'll research that more).  
 
 
-# Shit on Crackers
+
 # I should write a bunch of modules (functions) 
 
 # File transfer
@@ -40,14 +40,14 @@ import socket
 import os
 # import tqdm
 
-def transfer_file(filename):
+def transfer_file(filename, input_ip, input_port):
 
   SEPARATOR = "<SEPARATOR>"
   BUFFER_SIZE = 4096
 
 
-  host = "127.0.0.1" # Should be entered by the user (Fix that later)
-  port = 9999
+  host = input_ip # A String
+  port = input_port # Number
 
   # Maybe I can include the files in the git repository
 
