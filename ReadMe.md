@@ -36,7 +36,6 @@
 * I want to download linpeas, run it and save the output in a file
 
 * https://www.thepythoncode.com/article/send-receive-files-using-sockets-python  
-* Shit on Crackers
 * I should write a bunch of modules (functions) 
 
 * File transfer
